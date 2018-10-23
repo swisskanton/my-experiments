@@ -2,7 +2,7 @@ const table = require('table');
 const random = require('random');
 const keypress = require('keypress');
 const clear = require('console-clear');
-const readlineSync = require('readline-sync');
+//const readlineSync = require('readline-sync');
 
 const makeTable = (diff, level) => {
     //{userTable, controlTable}
@@ -33,18 +33,18 @@ const setControlTable = (controlTable, diff, level) => {
 
 const getTable = (matrix) => {
     output = table.table(matrix);
-    //clear(true);
+    clear(true);
     console.log(output);
 }
 
-const getMove = (matrix, diff, level) => {
+const getMove = (matrix, diff, level, winner) => {
     let posX = 0, posY = 0;
     let ki = 0, step = 0;
     diff --;
-    matrix[posX][posY] = '×';
-    gues = [];
+        matrix[posX][posY] = '×', backInfo = ' ';
+    let guess = [];
     for (let i=1; i <= level; i++) {
-        gues.push(i);
+        guess.push(i);
     }
     do {
         getTable(matrix);
@@ -60,6 +60,7 @@ const getMove = (matrix, diff, level) => {
                 case 'up':
                     if (posX != 0) {
                         [matrix[posX][posY], matrix[posX - 1][posY]] = [matrix[posX - 1][posY], matrix[posX][posY]];
+                        [backInfo, matrix[posX][posY]] = [matrix[posX][posY], backInfo];
                         posX--;
                         getTable(matrix);
                     };
@@ -67,6 +68,7 @@ const getMove = (matrix, diff, level) => {
                 case 'down':
                     if (posX != diff) {
                         [matrix[posX][posY], matrix[posX + 1][posY]] = [matrix[posX + 1][posY], matrix[posX][posY]];
+                        [backInfo, matrix[posX][posY]] = [matrix[posX][posY], backInfo];
                         posX++;
                         getTable(matrix);
                     };
@@ -74,6 +76,7 @@ const getMove = (matrix, diff, level) => {
                 case 'right':
                     if (posY != diff) {
                         [matrix[posX][posY], matrix[posX][posY + 1]] = [matrix[posX][posY + 1], matrix[posX][posY]];
+                        [backInfo, matrix[posX][posY]] = [matrix[posX][posY], backInfo];
                         posY++;
                         getTable(matrix);
                     };
@@ -81,28 +84,29 @@ const getMove = (matrix, diff, level) => {
                 case 'left':
                     if (posY != 0) {
                         [matrix[posX][posY], matrix[posX][posY - 1]] = [matrix[posX][posY - 1], matrix[posX][posY]];
+                        [backInfo, matrix[posX][posY]] = [matrix[posX][posY], backInfo];
                         posY--;
                         getTable(matrix);
                     };
                     break;
                 case 'space':
-                //matrix[posX][posY] == readlineSync.questionInt('Kérek egy számot: ');
-                    if (matrix[posX][posY] == ' ') {
-                        if (step < level) {
-                            gues.sort();
-                            matrix[posX][posY] = gues.splice(0, 1);
-                            step ++;
-                        } else {
-                            ki = 1;
-                        }
+                    //backInfo = matrix[posX][posY];
+                    if (backInfo == ' ') {
+                        //backInfo = matrix[posX][posY];
+                        backInfo = guess.shift();
+                        console.log('i', backInfo, guess);
                     } else {
-                        if (step < level) {
-                            gues.sort();
-                            [matrix[posX][posY], gues[0]] = [gues[0], matrix[posX][posY]];
-                        } else {
-                            ki = 1;
-                        }
-                    };
+                        guess.unshift(backInfo);
+                        guess.sort();
+                        backInfo = ' ';
+                        console.log('n', backInfo, guess);
+                    }
+                    
+                    if (guess.length == 0) {
+                        process.stdin.setRawMode(false);
+                        return isEnd(matrix, winner);
+                    }
+                    
                     break;
                 default:
                     console.log('téves karakter');
@@ -113,11 +117,21 @@ const getMove = (matrix, diff, level) => {
     } while (ki == 1);
     process.stdin.resume();
 }
+const isEnd = (matrix, winner) => {
+        for(var i = matrix.length; i--;) {
+            if(matrix[i] !== winner[i]) {
+                return 'Sajnálom, nem nyertél.';
+            }
+        }
+    
+        return 'Gratulálok nyertél!';
+}
 let difficulty = 7;
 let level = 3;
 let gameTable = makeTable(difficulty, level);
 let winnTable = makeTable(difficulty, level);
 setControlTable(winnTable, difficulty, level);
-getMove(gameTable, difficulty, level);
+end = getMove(gameTable, difficulty, level, winnTable);
+console.log(end);
 //getTable(viewTable);
 //getMove(gameTable);
