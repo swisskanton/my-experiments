@@ -39,8 +39,8 @@ const getTable = (matrix) => {
 
 const viewControlTable = (matrix) => {
     getTable(matrix);
-    let go = readlineSync.question('Do you want to start this level? [y/n]: '); 
-    if (go == 'y' || 'Y') {
+    let go = readlineSync.question('Do you want to start this level? [y/n]: ');
+    if (go == ('y' || 'Y')) {
         console.log('igaz');
         return true;
     } else {
@@ -52,10 +52,10 @@ const viewControlTable = (matrix) => {
 const getMove = (matrix, diff, level, winner) => {
     let posX = 0, posY = 0;
     let ki = 0, step = 0;
-    diff --;
-        matrix[posX][posY] = '×', backInfo = ' ';
+    diff--;
+    matrix[posX][posY] = '×', backInfo = ' ';
     let guess = [];
-    for (let i=1; i <= level; i++) {
+    for (let i = 1; i <= level; i++) {
         guess.push(i);
     };
     do {
@@ -113,15 +113,17 @@ const getMove = (matrix, diff, level, winner) => {
                         backInfo = ' ';
                         console.log('n', backInfo, guess);
                     };
-            
+
                     if (guess.length == 0) {
                         //process.stdin.setRawMode(false);
                         if (isCorrect(matrix, winner)) {
                             process.stdin.setRawMode(false);
                             return true;
-                        }
+                        } else {
+                            return false;
+                        };
                     };
-                    
+
                     break;
                 default:
                     console.log('wrong character');
@@ -133,52 +135,58 @@ const getMove = (matrix, diff, level, winner) => {
     process.stdin.resume();
 };
 const isCorrect = (matrix, winner) => {
-        for(var i = matrix.length; i--;) {
-            if(matrix[i] !== winner[i]) {
-                return false;
-            };
+    for (var i = matrix.length; i--;) {
+        if (matrix[i] !== winner[i]) {
+            return false;
         };
-        return true;
+    };
+    return true;
 };
 
-let difficulty = 7;
-let level = 3;
-let options = ['beginner', 'advanced', 'master'];
-difficulty = readlineSync.keyInSelect(options, "Please, select the difficulty level?");
-switch (difficulty) {
-    case 0 :
-        difficulty = 3;
-        break;
-    case 1 :
-        difficulty = 5;
-        break;
-    case 2 :
-        difficulty = 7;
-        break;
-    case -1 :
-        console.log('Thank you for visiting.');
+const beginning = () => {
+    let difficulty = 7;
+    let level = 3;
+    let options = ['beginner', 'advanced', 'master'];
+    difficulty = readlineSync.keyInSelect(options, "Please, select the difficulty level?");
+    switch (difficulty) {
+        case 0:
+            difficulty = 3;
+            break;
+        case 1:
+            difficulty = 5;
+            break;
+        case 2:
+            difficulty = 7;
+            break;
+        case -1:
+            console.log('Thank you for visiting.');
+    };
+    if (difficulty != -1) {
+        level = readlineSync.question("With how many numbers woud you like to start? [3-12]: ");
+    };
 };
-if (difficulty != -1) {
-    level = readlineSync.question("With how many numbers woud you like to start? [3-12]: ");
-    let endOfGame = 1;
-    while (endOfGame == 1) {
-        let gameTable = makeTable(difficulty, level);
-        let winnTable = makeTable(difficulty, level);
-        setControlTable(winnTable, difficulty, level);
-        let toGame = viewControlTable(winnTable);
-        console.log('toGame: ', toGame);
-        if (toGame == true) {
-           if (getMove(gameTable, difficulty, level, winnTable)) {
-                console.log('Congratulation! You win!');
-                if (readlineSync.keyInYN('Woud you like to play on the next level?')) {
-                    level++;  
-                } else {
-                    endOfGame = 0;
-                    console.log('Thank you for a game.');
-                };
-           };
+
+beginning;
+let playtime = true;
+while (playtime) {
+    let gameTable = makeTable(difficulty, level);
+    let winnTable = makeTable(difficulty, level);
+    setControlTable(winnTable, difficulty, level);
+    let toPlay = viewControlTable(winnTable);
+    console.log('toPlay: ', toPlay);
+    if (toPlay == true) {
+        if (getMove(gameTable, difficulty, level, winnTable)) {
+            console.log('Congratulation! You win!');
+            if (readlineSync.keyInYN('Woud you like to play on the next level?')) {
+                level++;
+            } else {
+                playtime = false;
+                console.log('Thank you for a game.');
+            };
         } else {
-            console.log('Thank you for watching.');
+            console.log("Sorry, you lost.");
         };
+    } else {
+        console.log('Thank you for watching.');
     };
 };
