@@ -2,7 +2,7 @@ const table = require('table');
 const random = require('random');
 const keypress = require('keypress');
 const clear = require('console-clear');
-//const readlineSync = require('readline-sync');
+const readlineSync = require('readline-sync');
 
 const makeTable = (diff, level) => {
     //{userTable, controlTable}
@@ -126,8 +126,10 @@ const isEnd = (matrix, winner) => {
     
         return 'Gratulálok nyertél!';
 }
-let difficulty = 7;
+let difficulty = 5;
 let level = 3;
+difficulty = readlineSync.question("Milyen nehézségi szinten játszol (3, 5, 7)?");
+level = readlineSync.question("Hány számmal szeretnél kezdeni (3-12)?");
 let gameTable = makeTable(difficulty, level);
 let winnTable = makeTable(difficulty, level);
 setControlTable(winnTable, difficulty, level);
