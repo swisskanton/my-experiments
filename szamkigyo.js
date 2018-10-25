@@ -51,7 +51,7 @@ const viewControlTable = (matrix) => {
 
 const getMove = (matrix, diff, level, winner) => {
     let posX = 0, posY = 0;
-    let ki = 0, step = 0;
+    let ki = 0;
     diff--;
     matrix[posX][posY] = '×', backInfo = ' ';
     let guess = [];
@@ -164,15 +164,16 @@ const beginning = () => {
     if (difficulty != -1) {
         level = readlineSync.question("With how many numbers woud you like to start? [3-12]: ");
     };
+    return [difficulty, level];
 };
 
-beginning;
+[difficulty, level] = beginning();
 let playtime = true;
 while (playtime) {
     let gameTable = makeTable(difficulty, level);
     let winnTable = makeTable(difficulty, level);
     setControlTable(winnTable, difficulty, level);
-    let toPlay = viewControlTable(winnTable);
+    let toPlay = false; //viewControlTable(winnTable);
     console.log('toPlay: ', toPlay);
     if (toPlay == true) {
         if (getMove(gameTable, difficulty, level, winnTable)) {
@@ -185,8 +186,14 @@ while (playtime) {
             };
         } else {
             console.log("Sorry, you lost.");
+            setTimeout((function() {  
+                return process.kill(process.pid);
+            }), 5000);
         };
     } else {
         console.log('Thank you for watching.');
+        setTimeout((function() {  
+            return process.kill(process.pid);
+        }), 5000);               
     };
 };
